@@ -70,6 +70,7 @@ export default function EclosionSection() {
       end: "+=2200",
       pin: true,
       scrub: 0.6,
+      anticipatePin: 1,
       onUpdate: (self) => {
         progressRef.current = self.progress;
         // Crossfade des 3 chapitres selon la progression.

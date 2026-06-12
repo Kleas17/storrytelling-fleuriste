@@ -12,7 +12,7 @@ export default function PortfolioPreview() {
 
   const scope = useGsapScope<HTMLElement>(() => {
     if (prefersReducedMotion()) return;
-    gsap.from(".pp-card", {
+    gsap.from(".pp-reveal", {
       y: 60,
       scale: 0.92,
       opacity: 0,
@@ -24,6 +24,24 @@ export default function PortfolioPreview() {
         start: "top 80%",
         once: true,
       },
+    });
+
+    // Profondeur : chaque carte dérive à sa propre vitesse pendant le scroll.
+    gsap.utils.toArray<HTMLElement>(".pp-card").forEach((card, i) => {
+      gsap.fromTo(
+        card,
+        { y: 0 },
+        {
+          y: [-56, 24, -32][i % 3],
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".pp-grid",
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 1.2,
+          },
+        }
+      );
     });
   });
 
@@ -44,7 +62,9 @@ export default function PortfolioPreview() {
         <div className="pp-grid mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {featured.map((c) => (
             <div key={c.slug} className="pp-card">
-              <CreationCard creation={c} />
+              <div className="pp-reveal">
+                <CreationCard creation={c} />
+              </div>
             </div>
           ))}
         </div>

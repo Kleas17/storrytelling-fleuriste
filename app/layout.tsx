@@ -10,6 +10,7 @@ import Footer from "@/components/layout/Footer";
 import CustomCursor from "@/components/layout/CustomCursor";
 import ProgressStem from "@/components/layout/ProgressStem";
 import PetalEffects from "@/components/effects/PetalEffects";
+import FloraOverlay from "@/components/effects/FloraOverlay";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -97,6 +98,7 @@ export default function RootLayout({
             <Loader />
             <CustomCursor />
             <PetalEffects />
+            <FloraOverlay />
             <ProgressStem />
             <Header />
             <main id="contenu">{children}</main>

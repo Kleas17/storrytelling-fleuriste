@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { gsap } from "@/lib/gsap";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { prefersReducedMotion } from "@/hooks/useGsap";
 import { useSiteStore } from "@/lib/store";
 
@@ -31,6 +31,9 @@ export default function Loader() {
           document.documentElement.style.overflow = "";
           root.style.display = "none";
           setIntroDone(true);
+          // Les sections épinglées se sont mesurées pendant que le scroll
+          // était verrouillé : on re-mesure tout une fois l'intro terminée.
+          ScrollTrigger.refresh();
         },
       });
 

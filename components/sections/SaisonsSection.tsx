@@ -16,14 +16,24 @@ export default function SaisonsSection() {
 
     const mm = gsap.matchMedia();
     mm.add("(min-width: 1024px)", () => {
-      gsap.to(".saisons-track", {
-        xPercent: -75,
+      const track = scope.current?.querySelector<HTMLElement>(".saisons-track");
+      if (!track) return;
+
+      // Distance réelle mesurée (et re-mesurée à chaque refresh) : évite tout
+      // décalage dû à la scrollbar ou aux arrondis de 100vw.
+      const amount = () => track.scrollWidth - window.innerWidth;
+
+      gsap.to(track, {
+        x: () => -amount(),
         ease: "none",
         scrollTrigger: {
           trigger: scope.current,
+          start: "top top",
+          end: () => "+=" + amount(),
           pin: true,
           scrub: 1,
-          end: "+=2600",
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
           snap: {
             snapTo: 1 / 3,
             duration: { min: 0.2, max: 0.6 },
@@ -31,26 +41,12 @@ export default function SaisonsSection() {
           },
         },
       });
-
-      gsap.utils.toArray<HTMLElement>(".saison-panel-inner").forEach((el) => {
-        gsap.from(el, {
-          opacity: 0,
-          y: 50,
-          duration: 0.9,
-          scrollTrigger: {
-            trigger: el,
-            containerAnimation: undefined,
-            start: "top 90%",
-            once: true,
-          },
-        });
-      });
     });
   });
 
   return (
     <section ref={scope} className="overflow-hidden">
-      <div className="saisons-track flex flex-nowrap overflow-x-auto snap-x snap-mandatory lg:w-[400%] lg:overflow-visible lg:snap-none">
+      <div className="saisons-track flex w-full flex-nowrap snap-x snap-mandatory overflow-x-auto lg:w-max lg:snap-none lg:overflow-visible">
         {saisons.map((s, i) => (
           <article
             key={s.id}
