@@ -18,6 +18,18 @@ export function getLenis() {
 export const scrollVelocity = { current: 0 };
 
 export default function SmoothScroll({ children }: { children: ReactNode }) {
+  // Filet de sécurité : re-mesure tous les pins une fois la page
+  // entièrement chargée (polices, scènes 3D en dynamic import…).
+  useEffect(() => {
+    const refresh = () => ScrollTrigger.refresh();
+    if (document.readyState === "complete") {
+      const t = setTimeout(refresh, 300);
+      return () => clearTimeout(t);
+    }
+    window.addEventListener("load", refresh);
+    return () => window.removeEventListener("load", refresh);
+  }, []);
+
   useEffect(() => {
     // Scroll natif sur mobile (plus performant) et si reduced-motion.
     if (isTouchDevice() || prefersReducedMotion()) return;

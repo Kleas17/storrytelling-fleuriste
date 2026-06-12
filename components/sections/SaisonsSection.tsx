@@ -32,13 +32,9 @@ export default function SaisonsSection() {
           end: () => "+=" + amount(),
           pin: true,
           scrub: 1,
-          anticipatePin: 1,
           invalidateOnRefresh: true,
-          snap: {
-            snapTo: 1 / 3,
-            duration: { min: 0.2, max: 0.6 },
-            ease: "power1.inOut",
-          },
+          // Pas de snap : il se bat avec le smooth scroll Lenis et provoque
+          // des téléportations. Le scrub seul reste fluide.
         },
       });
 

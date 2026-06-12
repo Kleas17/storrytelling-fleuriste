@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
-import { prefersReducedMotion } from "@/hooks/useGsap";
+import { prefersReducedMotion, useIsomorphicLayoutEffect } from "@/hooks/useGsap";
 import { FLEUR_SAISON, getSaisonActuelle } from "@/lib/saison-actuelle";
 
 const BloomScene = dynamic(() => import("@/components/three/BloomScene"), {
@@ -48,7 +48,9 @@ export default function EclosionSection() {
     }
   }, []);
 
-  useEffect(() => {
+  // Layout effect : le pin doit être créé dans la même phase que ceux des
+  // autres sections (ordre du document), sinon leurs starts se décalent.
+  useIsomorphicLayoutEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
 
