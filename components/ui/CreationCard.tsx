@@ -1,11 +1,13 @@
 import TransitionLink from "@/components/ui/TransitionLink";
 import FloralArt from "@/components/ui/FloralArt";
+import TiltCard from "@/components/ui/TiltCard";
 import { categories, type Creation } from "@/lib/data/creations";
 
 export default function CreationCard({ creation }: { creation: Creation }) {
   const catLabel = categories.find((c) => c.id === creation.categorie)?.label;
 
   return (
+    <TiltCard>
     <TransitionLink
       href={`/creations/${creation.slug}`}
       data-cursor="Voir"
@@ -25,5 +27,6 @@ export default function CreationCard({ creation }: { creation: Creation }) {
         <p className="font-display text-xl text-mousse">{creation.titre}</p>
       </div>
     </TransitionLink>
+    </TiltCard>
   );
 }

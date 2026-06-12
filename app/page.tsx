@@ -1,5 +1,7 @@
 import Hero from "@/components/sections/Hero";
 import Manifeste from "@/components/sections/Manifeste";
+import EclosionSection from "@/components/sections/EclosionSection";
+import MarqueeBand from "@/components/sections/MarqueeBand";
 import SavoirFaireSection from "@/components/sections/SavoirFaireSection";
 import PortfolioPreview from "@/components/sections/PortfolioPreview";
 import SaisonsSection from "@/components/sections/SaisonsSection";
@@ -12,9 +14,11 @@ export default function HomePage() {
     <>
       <Hero />
       <Manifeste />
+      <EclosionSection />
       <TigeDivider />
       <SavoirFaireSection />
       <PortfolioPreview />
+      <MarqueeBand />
       <SaisonsSection />
       <Temoignages />
       <CtaFinal />

@@ -11,6 +11,12 @@ export function getLenis() {
   return lenisInstance;
 }
 
+/**
+ * Vélocité de scroll partagée (px/frame, signée) — le « vent » du site :
+ * les pétales 3D et le marquee s'inclinent quand on scrolle fort.
+ */
+export const scrollVelocity = { current: 0 };
+
 export default function SmoothScroll({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Scroll natif sur mobile (plus performant) et si reduced-motion.
@@ -27,6 +33,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
 
     const raf = (time: number) => {
       lenis.raf(time * 1000);
+      scrollVelocity.current = lenis.velocity;
     };
     gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);

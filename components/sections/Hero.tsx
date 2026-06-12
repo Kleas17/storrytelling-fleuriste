@@ -6,6 +6,7 @@ import { gsap, SplitText } from "@/lib/gsap";
 import { useGsapScope, prefersReducedMotion, isTouchDevice } from "@/hooks/useGsap";
 import { useSiteStore } from "@/lib/store";
 import { getLenis } from "@/components/providers/SmoothScroll";
+import { ARTICLE_SAISON, PETALES_SAISON, getSaisonActuelle } from "@/lib/saison-actuelle";
 
 const PetalsScene = dynamic(() => import("@/components/three/PetalsScene"), {
   ssr: false,
@@ -95,7 +96,7 @@ export default function Hero() {
         background: "radial-gradient(ellipse at 50% 35%, #1d2620 0%, #11160f 70%, #0b0e0a 100%)",
       }}
     >
-      {show3D && <PetalsScene count={petalCount} />}
+      {show3D && <PetalsScene count={petalCount} colors={PETALES_SAISON[getSaisonActuelle()]} />}
 
       <div className="relative z-10 px-6 text-center">
         <h1 className="hero-title text-balance font-display text-5xl font-bold leading-[1.05] text-ivoire opacity-0 md:text-7xl lg:text-8xl">
@@ -108,6 +109,9 @@ export default function Hero() {
           style={{ opacity: 0, transform: "translateY(16px)" }}
         >
           Atelier d&apos;art floral — créations sur-mesure, vivantes et éphémères.
+          <span className="mt-3 block font-caps text-xs not-italic uppercase tracking-[0.3em] text-sienne">
+            L&apos;atelier vit au rythme {ARTICLE_SAISON[getSaisonActuelle()]}
+          </span>
         </p>
         <button
           type="button"

@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { scrollVelocity } from "@/components/providers/SmoothScroll";
 
 const PETAL_COLORS = ["#F5F0EB", "#D8C9B8", "#B8814A", "#7C9473", "#EDE8E1"];
 
@@ -42,11 +43,23 @@ interface PetalData {
   scale: number;
 }
 
-function Petals({ count }: { count: number }) {
+function Petals({ count, colors }: { count: number; colors: string[] }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const groupRef = useRef<THREE.Group>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const texture = useMemo(() => makePetalTexture(), []);
+  const gyro = useRef({ x: 0, y: 0 });
+
+  // Gyroscope mobile : les pétales suivent l'inclinaison du téléphone.
+  useEffect(() => {
+    const onOrientation = (e: DeviceOrientationEvent) => {
+      if (e.gamma === null || e.beta === null) return;
+      gyro.current.x = THREE.MathUtils.clamp(e.gamma / 45, -1, 1);
+      gyro.current.y = THREE.MathUtils.clamp((e.beta - 45) / 45, -1, 1);
+    };
+    window.addEventListener("deviceorientation", onOrientation);
+    return () => window.removeEventListener("deviceorientation", onOrientation);
+  }, []);
 
   const petals = useMemo<PetalData[]>(
     () =>
@@ -70,18 +83,24 @@ function Petals({ count }: { count: number }) {
     if (!mesh) return;
     const t = state.clock.elapsedTime;
 
-    // Parallaxe 3D subtile pilotée par la souris.
+    // « Vent » : la vélocité du scroll amplifie le balancement et incline la scène.
+    const wind = THREE.MathUtils.clamp(Math.abs(scrollVelocity.current) / 60, 0, 1);
+
+    // Parallaxe 3D pilotée par la souris (desktop) ou le gyroscope (mobile).
     if (group) {
-      group.rotation.y += (state.pointer.x * 0.12 - group.rotation.y) * 0.04;
-      group.rotation.x += (-state.pointer.y * 0.08 - group.rotation.x) * 0.04;
+      const px = state.pointer.x !== 0 ? state.pointer.x : gyro.current.x;
+      const py = state.pointer.y !== 0 ? state.pointer.y : -gyro.current.y;
+      group.rotation.y += (px * 0.12 - group.rotation.y) * 0.04;
+      group.rotation.x += (-py * 0.08 - group.rotation.x) * 0.04;
+      group.rotation.z += (wind * 0.08 * Math.sign(scrollVelocity.current || 1) - group.rotation.z) * 0.05;
     }
 
     for (let i = 0; i < petals.length; i++) {
       const p = petals[i];
-      // Chute lente, bouclée verticalement
-      const fall = (p.y - t * p.fallSpeed) % 14;
+      // Chute lente, bouclée verticalement — accélérée par le vent du scroll.
+      const fall = (p.y - t * p.fallSpeed * (1 + wind * 1.5)) % 14;
       const y = ((fall + 14) % 14) - 7;
-      const x = p.x + Math.sin(t * p.swaySpeed + p.phase) * p.swayAmp;
+      const x = p.x + Math.sin(t * p.swaySpeed + p.phase) * p.swayAmp * (1 + wind * 2);
       const z = p.z + Math.cos(t * p.swaySpeed * 0.7 + p.phase) * 0.5;
       dummy.position.set(x, y, z);
       dummy.rotation.set(t * p.rotSpeed + p.phase, t * p.rotSpeed * 0.8, p.phase);
@@ -97,7 +116,7 @@ function Petals({ count }: { count: number }) {
     if (!mesh) return;
     const c = new THREE.Color();
     for (let i = 0; i < count; i++) {
-      c.set(PETAL_COLORS[i % PETAL_COLORS.length]);
+      c.set(colors[i % colors.length]);
       mesh.setColorAt(i, c);
     }
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
@@ -123,7 +142,13 @@ function Petals({ count }: { count: number }) {
  * Scène hero : pétales en particules flottants (instanced mesh, 60 fps).
  * Le nombre de particules est réduit sur mobile.
  */
-export default function PetalsScene({ count = 320 }: { count?: number }) {
+export default function PetalsScene({
+  count = 320,
+  colors = PETAL_COLORS,
+}: {
+  count?: number;
+  colors?: string[];
+}) {
   return (
     <Canvas
       camera={{ position: [0, 0, 9], fov: 50 }}
@@ -132,7 +157,7 @@ export default function PetalsScene({ count = 320 }: { count?: number }) {
       style={{ position: "absolute", inset: 0 }}
       aria-hidden="true"
     >
-      <Petals count={count} />
+      <Petals count={count} colors={colors} />
     </Canvas>
   );
 }

@@ -40,6 +40,8 @@ export default function ContactForm() {
       });
       if (!res.ok) throw new Error("server");
       setEnvoye(true);
+      // Pluie de pétales plein écran (moteur global PetalEffects).
+      window.dispatchEvent(new CustomEvent("petal-burst", { detail: { count: 160 } }));
       requestAnimationFrame(() => {
         if (!confirmRef.current || prefersReducedMotion()) return;
         gsap.from(confirmRef.current, { opacity: 0, y: 24, duration: 0.8, ease: "power3.out" });

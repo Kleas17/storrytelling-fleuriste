@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import TransitionLink from "@/components/ui/TransitionLink";
+import FooterGarden from "@/components/layout/FooterGarden";
 import { settings } from "@/lib/data/settings";
 
 export default function Footer() {
@@ -37,6 +38,8 @@ export default function Footer() {
               { href: "/savoir-faire", label: "Savoir-faire" },
               { href: "/creations", label: "Créations" },
               { href: "/saisons", label: "Saisons" },
+              { href: "/herbier", label: "Herbier" },
+              { href: "/quelle-fleur", label: "Quelle fleur êtes-vous ?" },
               { href: "/contact", label: "Contact" },
               { href: "/mentions-legales", label: "Mentions légales" },
             ].map((item) => (
@@ -108,7 +111,11 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-16 flex flex-col items-start justify-between gap-2 border-t border-ivoire/15 pt-6 text-xs text-ivoire/50 md:flex-row">
+        <div className="mt-14">
+          <FooterGarden />
+        </div>
+
+        <div className="mt-10 flex flex-col items-start justify-between gap-2 border-t border-ivoire/15 pt-6 text-xs text-ivoire/50 md:flex-row">
           <p>
             © {new Date().getFullYear()} {settings.nomFleuriste} — Tous droits réservés
           </p>

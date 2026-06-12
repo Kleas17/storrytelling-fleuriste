@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/savoir-faire", label: "Savoir-faire" },
   { href: "/creations", label: "Créations" },
   { href: "/saisons", label: "Saisons" },
+  { href: "/herbier", label: "Herbier" },
   { href: "/contact", label: "Contact" },
 ];
 
