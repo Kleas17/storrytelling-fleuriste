@@ -29,13 +29,34 @@ export default function Manifeste() {
         },
       }
     );
+
+    // Sortie « traversée » : le texte grossit et passe derrière la caméra
+    // pendant que la fleur 3D de la section suivante émerge du brouillard.
+    gsap.to(".manifeste-inner", {
+      scale: 1.22,
+      yPercent: -8,
+      opacity: 0,
+      transformOrigin: "50% 40%",
+      ease: "none",
+      scrollTrigger: {
+        trigger: scope.current,
+        start: "bottom 75%",
+        end: "bottom 15%",
+        scrub: true,
+      },
+    });
   });
 
   let wordIndex = 0;
 
   return (
-    <section id="manifeste" ref={scope} className="bg-ivoire py-28 md:py-44">
-      <div className="mx-auto max-w-4xl px-6 md:px-10">
+    <section
+      id="manifeste"
+      ref={scope}
+      data-depth-exempt
+      className="bg-ivoire py-28 md:py-44"
+    >
+      <div className="manifeste-inner mx-auto max-w-4xl px-6 md:px-10">
         <p className="mb-8 font-caps text-sm uppercase tracking-[0.25em] text-sienne">
           Manifeste
         </p>

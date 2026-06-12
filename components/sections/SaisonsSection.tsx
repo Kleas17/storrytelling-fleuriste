@@ -23,7 +23,7 @@ export default function SaisonsSection() {
       // décalage dû à la scrollbar ou aux arrondis de 100vw.
       const amount = () => track.scrollWidth - window.innerWidth;
 
-      gsap.to(track, {
+      const tween = gsap.to(track, {
         x: () => -amount(),
         ease: "none",
         scrollTrigger: {
@@ -41,11 +41,31 @@ export default function SaisonsSection() {
           },
         },
       });
+
+      // Profondeur dans l'axe horizontal : les visuels dérivent moins vite
+      // que le track (parallaxe interne pilotée par containerAnimation).
+      gsap.utils.toArray<HTMLElement>(".saison-visual").forEach((el) => {
+        gsap.fromTo(
+          el,
+          { x: -70 },
+          {
+            x: 70,
+            ease: "none",
+            scrollTrigger: {
+              trigger: el,
+              containerAnimation: tween,
+              start: "left right",
+              end: "right left",
+              scrub: true,
+            },
+          }
+        );
+      });
     });
   });
 
   return (
-    <section ref={scope} className="overflow-hidden">
+    <section ref={scope} data-pinned className="overflow-hidden">
       <div className="saisons-track flex w-full flex-nowrap snap-x snap-mandatory overflow-x-auto lg:w-max lg:snap-none lg:overflow-visible">
         {saisons.map((s, i) => (
           <article
@@ -76,7 +96,7 @@ export default function SaisonsSection() {
                 </TransitionLink>
               </div>
               <div className="hidden justify-center md:flex">
-                <div className="w-[320px] overflow-hidden rounded-t-full lg:w-[380px]">
+                <div className="saison-visual w-[320px] overflow-hidden rounded-t-full lg:w-[380px]">
                   <FloralArt seed={`saison-${s.id}`} saison={s.id} className="h-auto w-full" />
                 </div>
               </div>

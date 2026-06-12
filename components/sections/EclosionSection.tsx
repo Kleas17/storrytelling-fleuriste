@@ -32,6 +32,7 @@ const CHAPITRES = (nomFleur: string) => [
 export default function EclosionSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const progressRef = useRef(0);
+  const approachRef = useRef(0);
   const [show3D, setShow3D] = useState(false);
 
   const saison = getSaisonActuelle();
@@ -53,12 +54,25 @@ export default function EclosionSection() {
 
     if (prefersReducedMotion()) {
       progressRef.current = 1;
+      approachRef.current = 1;
       const chaps = section.querySelectorAll<HTMLElement>(".ec-chapitre");
       chaps.forEach((c, i) => {
         c.style.opacity = i === chaps.length - 1 ? "1" : "0";
       });
       return;
     }
+
+    // Phase d'approche : pendant que la section précédente défile encore,
+    // la caméra avance — la fleur émerge du brouillard, depuis le fond.
+    const approche = ScrollTrigger.create({
+      trigger: section,
+      start: "top bottom",
+      end: "top top",
+      scrub: 0.5,
+      onUpdate: (self) => {
+        approachRef.current = self.progress;
+      },
+    });
 
     const chaps = Array.from(section.querySelectorAll<HTMLElement>(".ec-chapitre"));
     const setters = chaps.map((c) => gsap.quickSetter(c, "opacity"));
@@ -85,12 +99,16 @@ export default function EclosionSection() {
       },
     });
 
-    return () => trigger.kill();
+    return () => {
+      approche.kill();
+      trigger.kill();
+    };
   }, []);
 
   return (
     <section
       ref={sectionRef}
+      data-pinned
       className="relative flex h-[100svh] items-center overflow-hidden"
       style={{
         background:
@@ -100,7 +118,12 @@ export default function EclosionSection() {
     >
       {show3D && (
         <div className="absolute inset-y-0 right-0 w-full md:w-3/5">
-          <BloomScene progressRef={progressRef} petale={fleur.petale} coeur={fleur.coeur} />
+          <BloomScene
+            progressRef={progressRef}
+            approachRef={approachRef}
+            petale={fleur.petale}
+            coeur={fleur.coeur}
+          />
         </div>
       )}
 

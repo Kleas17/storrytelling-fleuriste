@@ -154,29 +154,52 @@ function Flower({
 }
 
 /**
+ * Travelling d'approche : la caméra part très loin (fleur noyée dans le
+ * brouillard) et s'avance pendant que la section précédente défile —
+ * la fleur « arrive du fond ».
+ */
+function CameraRig({ approachRef }: { approachRef: MutableRefObject<number> }) {
+  useFrame(({ camera }) => {
+    const a = smoothstep(THREE.MathUtils.clamp(approachRef.current, 0, 1));
+    const targetZ = 24 - a * 17.8; // 24 → 6.2
+    const targetY = 0.4 + (1 - a) * 2.2;
+    camera.position.z += (targetZ - camera.position.z) * 0.09;
+    camera.position.y += (targetY - camera.position.y) * 0.09;
+    camera.lookAt(0, 0.4, 0);
+  });
+  return null;
+}
+
+/**
  * Scène « Éclosion » : fleur procédurale (3 couronnes de pétales) qui
- * s'ouvre pilotée par le scroll (progressRef ∈ [0, 1]).
+ * s'ouvre pilotée par le scroll (progressRef ∈ [0, 1]), précédée d'un
+ * travelling d'approche dans le brouillard (approachRef ∈ [0, 1]).
  */
 export default function BloomScene({
   progressRef,
+  approachRef,
   petale,
   coeur,
 }: {
   progressRef: MutableRefObject<number>;
+  approachRef: MutableRefObject<number>;
   petale: string;
   coeur: string;
 }) {
   return (
     <Canvas
-      camera={{ position: [0, 0.4, 6.2], fov: 45 }}
+      camera={{ position: [0, 2.6, 24], fov: 45 }}
       dpr={[1, 1.8]}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       style={{ position: "absolute", inset: 0 }}
       aria-hidden="true"
     >
+      {/* Brouillard accordé au fond de la section : la fleur en émerge. */}
+      <fog attach="fog" args={["#131a14", 6, 19]} />
       <ambientLight intensity={0.85} />
       <directionalLight position={[3, 5, 4]} intensity={1.4} color="#FFF4E0" />
       <directionalLight position={[-4, 2, -3]} intensity={0.4} color="#B8814A" />
+      <CameraRig approachRef={approachRef} />
       <Flower progressRef={progressRef} petale={petale} coeur={coeur} />
     </Canvas>
   );

@@ -35,6 +35,23 @@ export default function Hero() {
 
   const scope = useGsapScope<HTMLElement>(
     () => {
+      // Profondeur à la sortie : le contenu s'enfonce et s'efface pendant
+      // que les pétales 3D, eux, restent au premier plan.
+      if (!prefersReducedMotion()) {
+        gsap.to(".hero-content", {
+          yPercent: -28,
+          scale: 0.88,
+          opacity: 0.15,
+          ease: "none",
+          scrollTrigger: {
+            trigger: scope.current,
+            start: "top top",
+            end: "bottom 25%",
+            scrub: true,
+          },
+        });
+      }
+
       if (!introDone) return;
       if (prefersReducedMotion()) {
         gsap.set([".hero-title", ".hero-sub", ".hero-cta", ".hero-scroll"], {
@@ -98,7 +115,7 @@ export default function Hero() {
     >
       {show3D && <PetalsScene count={petalCount} colors={PETALES_SAISON[getSaisonActuelle()]} />}
 
-      <div className="relative z-10 px-6 text-center">
+      <div className="hero-content relative z-10 px-6 text-center">
         <h1 className="hero-title text-balance font-display text-5xl font-bold leading-[1.05] text-ivoire opacity-0 md:text-7xl lg:text-8xl">
           Ce que les fleurs
           <br />
